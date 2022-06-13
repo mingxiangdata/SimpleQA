@@ -9,7 +9,7 @@ import requests
 import config
 
 def is_superhero(email):
-    response = requests.get(config.SUPERHERO_API_URL + '/superhero/%s' % email)
+    response = requests.get(config.SUPERHERO_API_URL + f'/superhero/{email}')
 
     if response.status_code == 404:
         return False

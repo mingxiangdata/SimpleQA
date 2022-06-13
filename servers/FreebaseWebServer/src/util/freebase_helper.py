@@ -41,23 +41,23 @@ class FreebaseHelper(object):
 			self.name_index = 'fb_5m_names_v1'
 			self.fact_index = 'fb_5m_facts_v1'
 		else:
-			raise Exception("Unknown index given %s" % index_name)
+			raise Exception(f"Unknown index given {index_name}")
 
 	def delete_index(self, index_name):
 		""" Deletes index with specified name 
 			index_name: Index to delete 
 		"""
 		if self.es.indices.exists(index_name):
-			print("Deleting index with name %s" % index_name)
+			print(f"Deleting index with name {index_name}")
 			self.es.indices.delete(index=index_name)
 		else:
-			print("Index with name %s does not exist so no need to delete" % index_name)
+			print(f"Index with name {index_name} does not exist so no need to delete")
 
-	def create_index(self, index_name): 
+	def create_index(self, index_name):
 		""" Creates index with specified name 
 			index_name: Index to create
 		"""
-		print("Creating index with name %s" % index_name)
+		print(f"Creating index with name {index_name}")
 		index_settings = {
 			  "mappings": {
 			    "fact": {
@@ -118,16 +118,16 @@ class FreebaseHelper(object):
 
 	def index_names(self, freebase_objs):
 		bulk_operands = []
-		for i in range(0, len(freebase_objs)):
+		for i in range(len(freebase_objs)):
 			if i % 50000 == 1:
-				print("Index stuff on index %s" % i)
+				print(f"Index stuff on index {i}")
 				self.es.bulk(index = self.name_index, body = bulk_operands, refresh = True)
 				bulk_operands = []
 
 			cur_obj = freebase_objs[i]
-			cur_id = cur_obj.id 
-			cur_freebase_id = cur_obj.freebase_id 
-			cur_name = cur_obj.freebase_name 
+			cur_id = cur_obj.id
+			cur_freebase_id = cur_obj.freebase_id
+			cur_name = cur_obj.freebase_name
 			cur_aliases = cur_obj.freebase_aliases
 			cur_description = cur_obj.freebase_description
 
@@ -142,7 +142,7 @@ class FreebaseHelper(object):
 			#	key = 'alias_%s' % i 
 			#	value = cur_aliases[i]
 			#	cur_doc[key] = value
-			
+
 			op_dict = {
 			  "index": {
 			     "_index": self.name_index, 
@@ -170,9 +170,9 @@ class FreebaseHelper(object):
 		"""
 
 		bulk_operands = []
-		for i in range(0, len(freebase_facts)):
+		for i in range(len(freebase_facts)):
 			if i % 5000 == 1:
-				print("Index stuff on index %s" % i)
+				print(f"Index stuff on index {i}")
 				self.es.bulk(index = self.fact_index, body = bulk_operands, refresh = True)
 				bulk_operands = []
 
@@ -181,14 +181,14 @@ class FreebaseHelper(object):
 			predicate = cur_fact.pred
 			tgt_obj = cur_fact.tgt
 
-			src_id = src_obj.id 
-			src_freebase_id = src_obj.freebase_id 
+			src_id = src_obj.id
+			src_freebase_id = src_obj.freebase_id
 			src_freebase_name = src_obj.freebase_name 
 
 			predicate_name = predicate.freebase_name 
 
-			tgt_id = tgt_obj.id 
-			tgt_freebase_id = tgt_obj.freebase_id 
+			tgt_id = tgt_obj.id
+			tgt_freebase_id = tgt_obj.freebase_id
 			tgt_freebase_name = tgt_obj.freebase_name 
 
 			cur_doc = {

@@ -16,12 +16,12 @@ class MetaBaseModel(db.Model.__class__):
         super().__init__(*args)
         cls.aliases = WeakValueDictionary()
 
-    def __getitem__(cls, key):
+    def __getitem__(self, key):
         try:
-            alias = cls.aliases[key]
+            alias = self.aliases[key]
         except KeyError:
-            alias = aliased(cls)
-            cls.aliases[key] = alias
+            alias = aliased(self)
+            self.aliases[key] = alias
         return alias
 
 
@@ -45,7 +45,9 @@ class BaseModel():
         """ Define a base way to jsonify models
             Columns inside `to_json_filter` are excluded """
         return {
-            column: value if not isinstance(value, datetime.date) else value.isoformat()
+            column: value.isoformat()
+            if isinstance(value, datetime.date)
+            else value
             for column, value in self._to_dict().items()
             if column not in self.to_json_filter
         }
