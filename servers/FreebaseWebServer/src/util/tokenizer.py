@@ -14,12 +14,7 @@ def remove_stopwords(sentence):
 	cleaned_string = map(lambda item:clean_token(item, stopwords_list), items)
 	string_w_spaces = ' '.join(cleaned_string)
 	raw_tokens = string_w_spaces.split()
-	single_space_string = ' '.join(raw_tokens)
-
-	if len(raw_tokens) < 1:
-		return sentence
-	else:
-		return single_space_string
+	return ' '.join(raw_tokens) if raw_tokens else sentence
 
 def clean_token(token, stopwords_list):
 	if token.lower() in stopwords_list or token == "s" or token in verb_list:
@@ -30,8 +25,7 @@ def clean_token(token, stopwords_list):
 def replace_accents(token):
 	""" Replaces accents with special value """
 	utf8_str = token.decode('utf-8')
-	normalized_str = unidecode(utf8_str)
-	return normalized_str
+	return unidecode(utf8_str)
 
 def clean_name_arr(name_arr, query):
 	""" Only returns values from name_dict whose keys are a substring of query 
@@ -39,14 +33,14 @@ def clean_name_arr(name_arr, query):
 	"""
 	correct_names = []
 
-	query = query + " "
+	query = f"{query} "
 	lowercase_query = query.lower()
 	quote_removed_query = lowercase_query.replace('\\"', '')
 	question_removed_query = lowercase_query.replace('?', '')
 	quote_removed_question_query = lowercase_query.replace('"', '').replace('?', '')
 
 	for k in name_arr:
-		spaced_k = k.lower() + " "
+		spaced_k = f"{k.lower()} "
 		if spaced_k in lowercase_query or \
 		spaced_k in quote_removed_query or \
 		spaced_k in question_removed_query or \
@@ -59,8 +53,8 @@ def remove_substrings_arr(substring_arr):
 	""" Remove any string in array that is a substring in another string 
 	"""
 	substring_set = set(substring_arr)
-	filtered_items = filter(lambda item: not is_substring(item, substring_set), substring_arr)
-	return filtered_items
+	return filter(lambda item: not is_substring(item, substring_set),
+	              substring_arr)
 
 def is_substring(string, string_set):
 	"""
@@ -68,18 +62,11 @@ def is_substring(string, string_set):
 	string_set that is not equal to string
 	"""
 	substrings = filter(lambda cur_string: (string in cur_string) and string != cur_string, string_set)
-	is_substring = len(substrings) > 0
-	return is_substring
+	return len(substrings) > 0
 
 def clean_name_dict(name_dict, query):
 	""" Only returns values from name_dict whose keys are a substring of query 
 		name_dict: maps names to ids, keys
 	"""
-	correct_names = dict()
-
 	lowercase_query = query.lower()
-	for k, v in name_dict.iteritems():
-		if k.lower() in lowercase_query:
-			correct_names[k] = v
-
-	return correct_names
+	return {k: v for k, v in name_dict.iteritems() if k.lower() in lowercase_query}
